@@ -1,0 +1,57 @@
+{
+  "name": "kimia-framework-cli",
+  "description": "kimia framework command cli",
+  "version": "0.1.4",
+  "author": "madkne",
+  "keywords": [
+    "kimia",
+    "framework",
+    "developer",
+    "cli",
+    "devkit"
+  ],
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "patterns",
+    "bin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kimia-framework/kcl.git"
+  },
+  "license": "MIT",
+  "preferGlobal": true,
+  "bin": {
+    "kcl": "./bin/kcl.js"
+  },
+  "scripts": {
+    "build": "rm -rdf dist && tsc -b tsconfig.json",
+    "prepare": "npm run build",
+    "prepare1": "npm run build && webpack --progress --hot --config ./webpack.config.js --mode production",
+    "watch1": "concurrently \"tsc -b -w tsconfig.json\" \"webpack --progress --hot --config ./webpack.config.js --mode production\"",
+    "start": "tsc -b tsconfig.json && node dist/index.js",
+    "watch": "tsc -b -w tsconfig.json",
+    "dev1": "concurrently \"tsc -b -w tsconfig.json\" \"nodemon dist/index.js\""
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "express": "^4.17.1",
+    "shelljs": "^0.8.4",
+    "tslib": "^2.2.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.8",
+    "@types/express": "^4.17.11",
+    "@types/shelljs": "^0.8.9",
+    "babel-loader": "^8.2.2",
+    "concurrently": "^6.2.0",
+    "nodemon": "^2.0.12",
+    "webpack": "^5.46.0",
+    "webpack-cli": "^4.7.2",
+    "webpack-node-externals": "^3.0.0"
+  }
+}
