@@ -1,7 +1,7 @@
 {
   "name": "kimia-framework-cli",
   "description": "kimia framework command cli",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "madkne",
   "keywords": [
     "kimia",
@@ -37,6 +37,7 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "express": "^4.17.1",
+    "jszip": "^3.7.1",
     "shelljs": "^0.8.4",
     "tslib": "^2.2.0",
     "tslint": "^6.1.3",

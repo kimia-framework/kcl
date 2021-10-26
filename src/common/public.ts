@@ -166,3 +166,78 @@ export function deleteDirectory(path: string) {
 export function checkGitInstalled() {
    return execSync('git --version').indexOf('git version') > -1;
 }
+/************************************************************* */
+export async function createZipFile(path: string, newPath: string, excludeFiles?: string[], excludeDirs?: string[]) {
+   var jszip = require('jszip');
+   const zip = new jszip();
+   const addZip = (path: string, zipPath: string) => {
+      const files = FS.readdirSync(path, { withFileTypes: true });
+      for (const f of files) {
+         // =>if file
+         if (f.isFile()) {
+            let newPath = PATH.join(zipPath, f.name);
+            // =>check not in exclude files
+            if (excludeFiles && excludeFiles.includes(newPath)) continue;
+            // =>add file
+            zip.file(PATH.join(zipPath, f.name), FS.readFileSync(PATH.join(path, f.name)));
+         }
+         //=> if dir
+         if (f.isDirectory()) {
+            // console.log('dir:', PATH.join(zipPath, f.name));
+            let newPath = PATH.join(zipPath, f.name);
+            // =>check not in exclude dirs
+            if (excludeDirs && excludeDirs.includes(newPath)) continue;
+            // =>add folder
+            zip.folder(PATH.join(zipPath, f.name));
+            addZip(PATH.join(path, f.name), PATH.join(zipPath, f.name));
+         }
+      }
+   }
+   // =>add files to zip
+   addZip(path, '');
+   // =>create zip file
+   return new Promise((res) => {
+      zip.generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+         .pipe(FS.createWriteStream(newPath))
+         .on('finish', () => {
+            // JSZip generates a readable stream with a "end" event,
+            // but is piped here in a writable stream which emits a "finish" event.
+            // infoLog('create a zip file in :' + newPath);
+            res(newPath);
+         });
+   });
+}
+/************************************************************* */
+export async function extractZipFile(path: string, extractPath: string) {
+   var jszip = require('jszip');
+
+   return new Promise((res) => {
+      FS.readFile(path, function (err, data) {
+         if (err) {
+            errorLog('err436532', err.message);
+            res(false);
+         }
+         else {
+            var zip = new jszip();
+            zip.loadAsync(data).then(function (contents: any) {
+               for (const filename of Object.keys(contents.files)) {
+                  if (!filename) continue;
+                  // =>check if dir
+                  if (zip.files[filename].dir) {
+                     FS.mkdirSync(PATH.join(extractPath, filename), { recursive: true });
+                  }
+                  // =>check if file
+                  else {
+                     zip.files[filename].async('nodebuffer').then(function (content: any) {
+                        FS.writeFileSync(PATH.join(extractPath, filename), content);
+                     });
+                  }
+               }
+               res(true);
+            });
+         }
+      });
+
+   });
+
+}
